@@ -16,15 +16,15 @@ Our project has a few key goals:
 
 Build 
 ---
-####Requirements
+#### Requirements
 + Java Development Kit 8
 + Maven
-####Compile
+#### Compile
 + UntitledProtect is still in developing, you can join our telegram channel to get the news about this plugin.
 
 Get 
 ---
-####Download
+#### Download
 + UntitledProtect is still in developing, you can join our telegram channel to get the news about this plugin.
 
 Contributing
