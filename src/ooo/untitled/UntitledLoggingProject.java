@@ -3,7 +3,7 @@ package ooo.untitled;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
+import org.bukkit.craftbukkit.v1_13_R1.CraftChunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -49,7 +49,7 @@ public class UntitledLoggingProject extends JavaPlugin implements Listener {
 	 */
     public void onAnyApplyPhysics(BlockPhysicsEvent event) { // Confused with `any`, look at our custom events
 	    Block source = event.getSourceBlock();
-	    if (!((CraftChunk) source.getChunk()).getHandle().j()) { // OBFHELPER - isTicked
+	    if (!((CraftChunk) source.getChunk()).getHandle().v()) { // OBFHELPER - isTicked
 	        //Bukkit.getLogger().warning("Skipped physics from unticked chunk @ from " + event.getChangedType().name() + " to " + source.getType().name());
 	        return;
 	    }
@@ -61,7 +61,7 @@ public class UntitledLoggingProject extends JavaPlugin implements Listener {
 	        // Impl Note: Double plant is one of the special block, we special case it because we
 	        // wanna capature the destroy of its upper plant which will not cause a physics event.
 	        // when break it by destroy its lower plant by hand, see below for more information.
-	        if (previousType != Material.DOUBLE_PLANT)
+	        if (previousType != Material.LEGACY_DOUBLE_PLANT)
 	            performLogBlockDisappearance(source, previousType);
 	        // Obviously no need to log those plant again.
 	        return;
