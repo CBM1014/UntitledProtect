@@ -1,26 +1,14 @@
 package ooo.untitled;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.google.common.collect.Sets;
 
 public class UntitledLoggingProject extends JavaPlugin implements Listener {
     private static UntitledLoggingProject singleton;
@@ -62,7 +50,7 @@ public class UntitledLoggingProject extends JavaPlugin implements Listener {
     public void onAnyApplyPhysics(BlockPhysicsEvent event) { // Confused with `any`, look at our custom events
 	    Block source = event.getSourceBlock();
 	    if (!((CraftChunk) source.getChunk()).getHandle().j()) { // OBFHELPER - isTicked
-	        Bukkit.getLogger().warning("Skipped physics from unpopulated chunk @ from " + event.getChangedType().name() + " to " + source.getType().name());
+	        //Bukkit.getLogger().warning("Skipped physics from unticked chunk @ from " + event.getChangedType().name() + " to " + source.getType().name());
 	        return;
 	    }
 	    
@@ -79,8 +67,7 @@ public class UntitledLoggingProject extends JavaPlugin implements Listener {
 	        return;
 	    }
 	    
-	    // Multiple used below
-	    Material changedType = event.getChangedType();
+	    Material changedType = event.getChangedType(); // Multiple used below
 	    
 	    // As you can see above, special blocks such as plant have been flitered,
 	    // so any event reach here was triggered by a `regular` update which update 6 face
@@ -110,12 +97,12 @@ public class UntitledLoggingProject extends JavaPlugin implements Listener {
         if (previousType == Material.DOUBLE_PLANT && lowerPlant(block))
             performLogBlockDisappearance(block.getRelative(0, 1, 0), Material.DOUBLE_PLANT);
         // Debug output for a regular (source) block change
-     // Bukkit.getLogger().info("Changed block: " + block.getType().name() + ", pervious type: " + previousType.name());
+        //Bukkit.getLogger().info("Changed block: " + block.getType().name() + ", pervious type: " + previousType.name());
 	}
 	
 	private static void performLogBlockDisappearance(Block block /* get data from this in future */, Material previousType /* for double plants to manually specify type */) {
 	    // Debug output for a disappeared block (single update - only plant and double plant for now)
-	 // Bukkit.getLogger().warning("Disappeared block: " + previousType.name() + " (single)");
+	    //Bukkit.getLogger().warning("Disappeared block: " + previousType.name() + " (single)");
     }
 	
 	public static class Unsafe {
