@@ -10,10 +10,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class UntitledLoggingProject extends JavaPlugin implements Listener {
-    private static UntitledLoggingProject singleton;
+public class UntitledProtect extends JavaPlugin implements Listener {
+    private static UntitledProtect singleton;
     
-    public UntitledLoggingProject() {
+    public UntitledProtect() {
         singleton = this;
     }
     
@@ -88,14 +88,14 @@ public class UntitledLoggingProject extends JavaPlugin implements Listener {
 	    // block is the lower part of a double plant, but also indicate whether there is a upper part.
 	    // By this way, we can catch the missing physics event which you can find more information about above.
 	    Material groundType = plant.getRelative(0, -1, 0).getType();
-	    return groundType == Material.GRASS || groundType == Material.DIRT || groundType == Material.SOIL;
+	    return groundType == Material.GRASS || groundType == Material.DIRT || groundType == Material.LEGACY_SOIL;
 	}
 	
 	private static void performLogBlockPhysics(Block block, Material previousType) {
 	    // Impl Note: At this moment, if we check the type of upper block, we
 	    // will only get `AIR`, so specify the type of the upper plant is needed.
-        if (previousType == Material.DOUBLE_PLANT && lowerPlant(block))
-            performLogBlockDisappearance(block.getRelative(0, 1, 0), Material.DOUBLE_PLANT);
+        if (previousType == Material.LEGACY_DOUBLE_PLANT && lowerPlant(block))
+            performLogBlockDisappearance(block.getRelative(0, 1, 0), Material.LEGACY_DOUBLE_PLANT);
         // Debug output for a regular (source) block change
         //Bukkit.getLogger().info("Changed block: " + block.getType().name() + ", pervious type: " + previousType.name());
 	}
@@ -106,7 +106,7 @@ public class UntitledLoggingProject extends JavaPlugin implements Listener {
     }
 	
 	public static class Unsafe {
-	    public static UntitledLoggingProject instance() {
+	    public static UntitledProtect instance() {
 	        return singleton;
 	    }
 	}
