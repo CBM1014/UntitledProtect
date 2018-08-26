@@ -28,7 +28,15 @@ public class UntitledProtect extends JavaPlugin implements Listener {
     
     @Override
     public void onEnable() {
+        long t = now();
         Bukkit.getPluginManager().registerEvents(this, this);
+
+        this.getLogger().info(c("The load is completed for " + millisToSeconds(now() - t) + " seconds."));
+    }
+
+    @Override
+    public void onDisable(){
+        this.getLogger().info(c("Plugin Disabled."));
     }
     
     private Block cachedSourceBlock; // TODO Debug
@@ -152,5 +160,19 @@ public class UntitledProtect extends JavaPlugin implements Listener {
     private static void performLogBlockDisappearance(Block block /* get data from this in future */, Material previousType /* for double plants to manually specify type */) {
         // Debug output for a disappeared block (single update - only plant and double plant for now)
         //Bukkit.getLogger().warning("Disappeared block: " + previousType.name() + " (single)");
+    }
+	
+	private long now() {
+        return System.currentTimeMillis();
+    }
+
+    private long millisToSeconds(Long millis) {
+        return (millis / 1000);
+    }
+
+    private String c(String in) {
+        String result = in.replace("&", "§");
+        result = result.replace("§§", "&");
+        return result;
     }
 }
