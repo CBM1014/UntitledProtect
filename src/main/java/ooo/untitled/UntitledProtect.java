@@ -16,6 +16,7 @@ import lombok.SneakyThrows;
 
 import static ooo.untitled.VersionLevel.modernApi;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -32,7 +33,15 @@ public class UntitledProtect extends JavaPlugin implements Listener {
     
     @Override
     public void onEnable() {
+        long t = now();
         Bukkit.getPluginManager().registerEvents(this, this);
+
+        this.getLogger().info(c("The load is completed for " + millisToSeconds(now() - t) + " seconds."));
+    }
+
+    @Override
+    public void onDisable(){
+        this.getLogger().info(c("Plugin Disabled."));
     }
     
     // Cache the last source block so we can catch single updates
@@ -45,16 +54,32 @@ public class UntitledProtect extends JavaPlugin implements Listener {
     private final static Method IS_TICKED_METHOD = isTickedMethod();
     @SneakyThrows
     private static Method isTickedMethod() {
-        Class<?> nmsChunkClass = Class.forName("net.minecraft.server.v1_" + (modernApi() ? "13" : "12") + "_R1.Chunk");
-        return modernApi() ? nmsChunkClass.getMethod("v") : nmsChunkClass.getMethod("j"); // OBFHELPER - isTicked
+        try {
+            Class<?> nmsChunkClass = Class.forName("net.minecraft.server.v1_" + (modernApi() ? "13" : "12") + "_R1.Chunk");
+            return modernApi() ? nmsChunkClass.getMethod("v") : nmsChunkClass.getMethod("j"); // OBFHELPER - isTicked
+        }catch(java.lang.ClassNotFoundException e){
+            e.printStackTrace();
+            return null;
+        }catch(java.lang.NoSuchMethodException e){
+            e.printStackTrace();
+            return null;
+        }
     }
     private final static Method GET_HANDLE_METHOD = getHandleMethod();
     @SneakyThrows
     private static Method getHandleMethod() {
-        Class<?> craftChunkClass = Class.forName("org.bukkit.craftbukkit.v1_" + (modernApi() ? "13" : "12") + "_R1.CraftChunk");
-        Method getHandleMethod = craftChunkClass.getDeclaredMethod("getHandle");
-        getHandleMethod.setAccessible(true);
-        return getHandleMethod;
+        try {
+            Class<?> craftChunkClass = Class.forName("org.bukkit.craftbukkit.v1_" + (modernApi() ? "13" : "12") + "_R1.CraftChunk");
+            Method getHandleMethod = craftChunkClass.getDeclaredMethod("getHandle");
+            getHandleMethod.setAccessible(true);
+            return getHandleMethod;
+        }catch(java.lang.ClassNotFoundException e){
+            e.printStackTrace();
+            return null;
+        }catch(java.lang.NoSuchMethodException e){
+            e.printStackTrace();
+            return null;
+        }
     }
     
     // Material generic constant
@@ -156,5 +181,19 @@ public class UntitledProtect extends JavaPlugin implements Listener {
     
     private static void performLogBlockDisappearance(Block block /* get data from this in future */, Material previousType /* for double plants to manually specify type */) {
         
+    }
+	
+	private long now() {
+        return System.currentTimeMillis();
+    }
+
+    private long millisToSeconds(Long millis) {
+        return (millis / 1000);
+    }
+
+    private String c(String in) {
+        String result = in.replace("&", "§");
+        result = result.replace("§§", "&");
+        return result;
     }
 }
