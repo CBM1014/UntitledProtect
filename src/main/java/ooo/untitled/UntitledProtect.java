@@ -7,13 +7,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.google.common.collect.Sets;
 
 import lombok.SneakyThrows;
 
 import static ooo.untitled.VersionLevel.modernApi;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 public class UntitledProtect extends JavaPlugin implements Listener {
     private static UntitledProtect singleton;
@@ -83,9 +87,8 @@ public class UntitledProtect extends JavaPlugin implements Listener {
      */
     public void onAnyApplyPhysics(BlockPhysicsEvent event) { // Confused with `any`, look at our custom events
         Block source = event.getSourceBlock();
-        if (! (boolean) IS_TICKED_METHOD.invoke(GET_HANDLE_METHOD.invoke(source.getChunk()))) {
-            return;
-        }
+        if (!(boolean) IS_TICKED_METHOD.invoke(GET_HANDLE_METHOD.invoke(source.getChunk())))
+            return; // Only a workaround
         
         // Impl Note: Only plants will causing an event whose source block is the same on the triggered block.
         // By this way, the source block equals with the trigger block in reference.
@@ -104,10 +107,11 @@ public class UntitledProtect extends JavaPlugin implements Listener {
         } else {
             // A single update won't happen before a regular update finish on same source block
             if (cachedSourceBlock.getBlockKey() != source.getBlockKey()) {
+                Bukkit.getLogger().warning("Skipped @"
+                        + "from " + event.getChangedType().name() + " to " + source.getType().name() + " in " + source.getX() + ", " + source.getY() + ", " + source.getZ()); // TODO DEBUG
                 // Impl Note: Natural water spread from terrain generated water source
-                physicsIndex = 1; // We used one index after all - we dunno whether current physics is dummy!
+                physicsIndex = 0; // We dunno whether current physics is dummy!
                 cachedSourceBlock = source;
-                return;
             }
         }
         
@@ -118,6 +122,8 @@ public class UntitledProtect extends JavaPlugin implements Listener {
         if (physicsIndex++ == 5) {
             if (!event.isCancelled()) {
                 Material previousType = event.getChangedType();
+                Bukkit.getLogger().severe("Logged @"
+                        + "from " + event.getChangedType().name() + " to " + source.getType().name() + " in " + source.getX() + ", " + source.getY() + ", " + source.getZ()); // TODO DEBUG
                 if (previousType == DOUBLE_PLANT && isLowerPlant(source)) {
                     // Workaround missing physics event for upper part of plant
                     // Impl Note: At this moment, if we check the type of upper block, we
@@ -129,7 +135,7 @@ public class UntitledProtect extends JavaPlugin implements Listener {
             }
             // Impl Note: Reset is important otherwise we will only log the first and only one block.
             physicsIndex = 0;
-            source = null; // No need to check when it's the first block of a physics round - we will ignore null, see above
+            cachedSourceBlock = null; // No need to check when it's the first block of a physics round - we will ignore null, see above
         }
     }
     
