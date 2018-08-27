@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 
 import static ooo.untitled.VersionLevel.modernApi;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class UntitledProtect extends JavaPlugin implements Listener {
@@ -48,16 +49,32 @@ public class UntitledProtect extends JavaPlugin implements Listener {
     private final static Method IS_TICKED_METHOD = isTickedMethod();
     @SneakyThrows
     private static Method isTickedMethod() {
-        Class<?> nmsChunkClass = Class.forName("net.minecraft.server.v1_" + (modernApi() ? "13" : "12") + "_R1.Chunk");
-        return modernApi() ? nmsChunkClass.getMethod("v") : nmsChunkClass.getMethod("j"); // OBFHELPER - isTicked
+        try {
+            Class<?> nmsChunkClass = Class.forName("net.minecraft.server.v1_" + (modernApi() ? "13" : "12") + "_R1.Chunk");
+            return modernApi() ? nmsChunkClass.getMethod("v") : nmsChunkClass.getMethod("j"); // OBFHELPER - isTicked
+        }catch(java.lang.ClassNotFoundException e){
+            e.printStackTrace();
+            return null;
+        }catch(java.lang.NoSuchMethodException e){
+            e.printStackTrace();
+            return null;
+        }
     }
     private final static Method GET_HANDLE_METHOD = getHandleMethod();
     @SneakyThrows
     private static Method getHandleMethod() {
-        Class<?> craftChunkClass = Class.forName("org.bukkit.craftbukkit.v1_" + (modernApi() ? "13" : "12") + "_R1.CraftChunk");
-        Method getHandleMethod = craftChunkClass.getDeclaredMethod("getHandle");
-        getHandleMethod.setAccessible(true);
-        return getHandleMethod;
+        try {
+            Class<?> craftChunkClass = Class.forName("org.bukkit.craftbukkit.v1_" + (modernApi() ? "13" : "12") + "_R1.CraftChunk");
+            Method getHandleMethod = craftChunkClass.getDeclaredMethod("getHandle");
+            getHandleMethod.setAccessible(true);
+            return getHandleMethod;
+        }catch(java.lang.ClassNotFoundException e){
+            e.printStackTrace();
+            return null;
+        }catch(java.lang.NoSuchMethodException e){
+            e.printStackTrace();
+            return null;
+        }
     }
     
     // Material generic constant
@@ -90,10 +107,16 @@ public class UntitledProtect extends JavaPlugin implements Listener {
      */
     public void onAnyApplyPhysics(BlockPhysicsEvent event) { // Confused with `any`, look at our custom events
         Block source = event.getSourceBlock();
+        try{
         if (! (boolean) IS_TICKED_METHOD.invoke(GET_HANDLE_METHOD.invoke(source.getChunk()))) { // TODO Adapt each version to avoid reflection use
             Bukkit.getLogger().warning("Skipped physics from unticked chunk @ from " + event.getChangedType().name() + " to " + source.getType().name());
             Bukkit.getLogger().warning("At @ " + source.getX() + ", " + source.getY() + ", " + source.getZ());
             return;
+        }
+        }catch(IllegalAccessException e){
+            e.printStackTrace();
+        }catch(InvocationTargetException e){
+            e.printStackTrace();
         }
         
         // Impl Note: Only plants will causing an event whose source block is the same on the triggered block.
